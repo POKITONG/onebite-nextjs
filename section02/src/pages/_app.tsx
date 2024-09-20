@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import Link from "next/link";
 import {useRouter} from "next/router";
+import {useEffect} from "react";
 
 export default function App({ Component, pageProps }: AppProps) {
   // 파라미터 Component : 현재 페이지 역할을 할 컴포넌트
@@ -24,11 +25,19 @@ export default function App({ Component, pageProps }: AppProps) {
     // back : 뒤로가기를 시키는 메서드
   };
 
+  // 링크 컴포넌트로 명시된 경로가 아니라면 프리 페칭이 이루어지지 않는다.
+
+  useEffect(() => {
+    router.prefetch("/test");
+    // 앱 컴포넌트가 마운트 됐을 때 단 한 번 /test 에 대한 JS 번들들을 프리페칭 한다.
+  }, []);
+
   return <>
     <header>
       <Link href={"/"}>index</Link>
       &nbsp;
-      <Link href={"/search"}>search</Link>
+      <Link href={"/search"} prefetch={false}>search</Link>
+      {/*prefetch=false 를 이용해 prefetch 를 명시적으로 제외해줄 수 있다.*/}
       &nbsp;
       <Link href={"/book/1"}>book/1</Link>
       <div>
