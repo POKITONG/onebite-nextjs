@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+// app 컴포넌트만 글로벌 css 파일로 불러와서 사용 가능
 import type { AppProps } from "next/app";
 import Link from "next/link";
 import {useRouter} from "next/router";
