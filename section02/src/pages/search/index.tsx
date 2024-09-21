@@ -1,4 +1,6 @@
 import {useRouter} from "next/router";
+import {ReactNode} from "react";
+import SearchableLayout from "@/components/searchable-layout";
 
 export default function Page() {
 
@@ -10,4 +12,9 @@ export default function Page() {
     // 쿼리스트링은 router.query 로 꺼내옴
 
     return <h1>Search {q}</h1>;
+};
+
+Page.getLayout = (page: ReactNode) => {
+    return <SearchableLayout>{page}</SearchableLayout>;
+
 };

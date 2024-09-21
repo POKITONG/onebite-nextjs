@@ -2,8 +2,16 @@ import "@/styles/globals.css";
 // app 컴포넌트만 글로벌 css 파일로 불러와서 사용 가능
 import type {AppProps} from "next/app";
 import GlobalLayout from "@/components/global-layout";
+import SearchableLayout from "@/components/searchable-layout";
+import {ReactNode} from "react";
+import {NextPage} from "next";
 
-export default function App({Component, pageProps}: AppProps) {
+type NextPageWithLayout = NextPage & {
+    getLayout? : (page: ReactNode) => ReactNode;
+};
+
+
+export default function App({Component, pageProps}: AppProps & { Component: NextPageWithLayout}) {
     // 파라미터 Component : 현재 페이지 역할을 할 컴포넌트
     // pageProps : 해당 페이지가 전달 받아야 하는 props 들
 
@@ -31,9 +39,13 @@ export default function App({Component, pageProps}: AppProps) {
         // 앱 컴포넌트가 마운트 됐을 때 단 한 번 /test 에 대한 JS 번들들을 프리페칭 한다.
       }, []);*/
 
+    const getLayout = Component.getLayout ?? ((page:ReactNode) => page);
+    // 불러오는 컴포넌트에 getlayout 함수가 정의되지 않았다면 조건에 따라서 앞의 조건문이 undefined 가 되므로 뒤의 함수가 실행된다.
+
+
     return (
         <GlobalLayout>
-            <Component {...pageProps} />
+            {getLayout(<Component {...pageProps} />)}
         </GlobalLayout>
     );
 };
