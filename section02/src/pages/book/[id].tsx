@@ -1,4 +1,7 @@
 import style from "./[id].module.css";
+import {GetServerSidePropsContext, InferGetServerSidePropsType} from "next";
+import fetchBooks from "@/lib/fetch-books";
+import fetchOneBook from "@/lib/fetch-one-book";
 
 const mockData = {
     id: 1,
@@ -10,8 +13,22 @@ const mockData = {
     coverImgUrl: "https://shopping-phinf.pstatic.net/main_3888828/38888282618.20230913071643.jpg"
 };
 
-export default function Page() {
-    const {id, title, subTitle, description, author, publisher, coverImgUrl} = mockData;
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+    const id = context.params!.id;
+    // [id] 페이지는 무조건 url 파라미터가 있어야만 접근할 수 있는 페이지이기 때문에 ! 단언을 사용해도 안전하다.
+
+    const book = await fetchOneBook(Number(id));
+    // url 파라미터로써 불러온 id는 기본적으로 string 타입을 갖기 때문에 number 타입으로 형변환해서 보내주어야 한다.
+
+    return {
+        props: {book}
+    }
+};
+
+export default function Page({book}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    if (!book) return "문제가 발생했습니다 다시 시도하세요";
+
+    const {id, title, subTitle, description, author, publisher, coverImgUrl} = book;
 
     return <div className={style.container}>
         <div className={style.cover_img_container} style={{backgroundImage: `url('${coverImgUrl}')`}}>
@@ -32,4 +49,4 @@ export default function Page() {
     // -> /book 의 인덱스 경로는 캐치 올 세그먼트도 불가능
     // -> 따로 인덱스 페이지를 만들지 않고 싶으면 [[...id]].tsx 식으로 라우팅 가능하다.
     // [[...id]] : 옵셔널 캐치 올 세그먼트
-}
+};

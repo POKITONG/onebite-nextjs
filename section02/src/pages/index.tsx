@@ -4,14 +4,16 @@
 // import "./index.module.css";
 import style from "./index.module.css";
 import SearchableLayout from "@/components/searchable-layout";
-import {ReactNode, useEffect} from "react";
+import {ReactNode} from "react";
 import books from "@/mock/books.json";
 import BookItem from "@/components/book-item";
 import {InferGetServerSidePropsType} from "next";
+import fetchBooks from "@/lib/fetch-books";
+import fetchRandomBooks from "@/lib/fetch-randomBooks";
 
 // @ 경로 : src 폴더를 가리키는 경로
 
-export const getServerSideProps = () => {
+export const getServerSideProps = async () => {
     // getServerSideProps 라는 약속된 이름의 함수를 만들어서 export 로 내보내주면 해당 페이지는 SSR 방식으로 사전렌더링 된다.
     // 클라이언트에서 페이지를 요청해서 넥스트가 사전 렌더링을 실행할 때, 해당 페이지 컴포넌트보다 먼저 실행되어서
     // 컴포넌트에 필요한 데이터를 또 다른 백엔드 서버로부터 불러오는 등의 기능을 하는 함수
@@ -30,18 +32,25 @@ export const getServerSideProps = () => {
      * 3. 컴포넌트 실행
      */
 
-    const data = "hello";
+/*    const allBooks = await fetchBooks();
+    const recoBooks = await fetchRandomBooks();*/
+
+    const [allBooks, recoBooks] = await Promise.all([
+        fetchBooks(),
+        fetchRandomBooks(),
+    ]);
+    // Promise.all() : 인수로 전달한 배열 안에 들어있는 모든 비동기 함수를 동시에 실행시켜주는 함수
 
     return {
         props: {
-            data,
+            allBooks, recoBooks,
         },
     };
 
     // ServerSideProps 의 return 값은 반드시 props 라는 객체 프로퍼티를 포함하는 단 하나의 객체여야만 한다.
 };
 
-export default function Home({data} : InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Home({allBooks, recoBooks} : InferGetServerSidePropsType<typeof getServerSideProps>) {
     // InferGetServerSidePropsType -> GetServerSideProps 함수에서 반환되는 값을 자동으로 타입 추론해주는 타입 객체
 
     // Home 컴포넌트 또한 서버에서 한 번 실행된 후 브라우저에서 한 번 더 실행된다.
@@ -55,16 +64,15 @@ export default function Home({data} : InferGetServerSidePropsType<typeof getServ
     }, []);*/
     // -> 브라우저에서만 실행 가능한 함수를 호출하고 싶을 때는 useEffect 사용
 
-    console.log(data);
     return (
         <div className={style.container}>
             <section>
                 <h3>지금 추천하는 도서</h3>
-                {books.map((book) => <BookItem key={book.id} {...book}/>)}
+                {recoBooks.map((book) => <BookItem key={book.id} {...book}/>)}
             </section>
             <section>
                 <h3>등록된 모든 도서</h3>
-                {books.map((book) => <BookItem key={book.id} {...book}/>)}
+                {allBooks.map((book) => <BookItem key={book.id} {...book}/>)}
             </section>
         </div>
     );
