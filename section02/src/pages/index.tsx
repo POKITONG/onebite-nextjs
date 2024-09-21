@@ -5,14 +5,24 @@
 import style from "./index.module.css";
 import SearchableLayout from "@/components/searchable-layout";
 import {ReactNode} from "react";
+import books from "@/mock/books.json";
+import BookItem from "@/components/book-item";
+
+// @ 경로 : src 폴더를 가리키는 경로
 
 export default function Home() {
-  return (
-      <>
-        <h1 className={style.h1}>인덱스</h1>
-        <h2 className={style.h2}>H2</h2>
-      </>
-  );
+    return (
+        <div className={style.container}>
+            <section>
+                <h3>지금 추천하는 도서</h3>
+                {books.map((book) => <BookItem key={book.id} {...book}/>)}
+            </section>
+            <section>
+                <h3>등록된 모든 도서</h3>
+                {books.map((book) => <BookItem key={book.id} {...book}/>)}
+            </section>
+        </div>
+    );
 
 
   // 넥스트에서는 App 컴포넌트를 제외하고 import 문을 통해서 그대로 css 파일을 불러오는 것을 제한한다.
