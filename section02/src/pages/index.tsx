@@ -5,16 +5,16 @@
 import style from "./index.module.css";
 import SearchableLayout from "@/components/searchable-layout";
 import {ReactNode} from "react";
-import books from "@/mock/books.json";
 import BookItem from "@/components/book-item";
-import {InferGetServerSidePropsType, InferGetStaticPropsType} from "next";
+import {InferGetStaticPropsType} from "next";
 import fetchBooks from "@/lib/fetch-books";
 import fetchRandomBooks from "@/lib/fetch-randomBooks";
+import Head from "next/head";
 
 // @ 경로 : src 폴더를 가리키는 경로
 
 export const getStaticProps = async () => {
-    console.log("인덱스 페이지");
+
     // getStaticProps : SSG 방식으로 렌더링하게 해주는 함수
     // -> 개발 모드에서는 SSR 이든, SSG 든 개발자의 편의를 위해서 호출을 받을때마다 컴포넌트들을 새롭게 렌더링 해준다.
     // SSG 방식이 디폴트
@@ -57,16 +57,28 @@ export default function Home({allBooks, recoBooks}: InferGetStaticPropsType<type
     // -> 브라우저에서만 실행 가능한 함수를 호출하고 싶을 때는 useEffect 사용
 
     return (
-        <div className={style.container}>
-            <section>
-                <h3>지금 추천하는 도서</h3>
-                {recoBooks.map((book) => <BookItem key={book.id} {...book}/>)}
-            </section>
-            <section>
-                <h3>등록된 모든 도서</h3>
-                {allBooks.map((book) => <BookItem key={book.id} {...book}/>)}
-            </section>
-        </div>
+        <>
+            <Head>
+                <title>한입북스</title>
+                {/* Next.js 앱에서는 Head 라는 추가적인 컴포넌트를 이용해서 페이지별로 필요한 타이틀이나
+                메타태그를 별도로 설정해 줄 수 있다. (SEO 설정) */}
+                <meta property="og:image" content="/thumbnail.png"/>
+                {/* og:image :: 썸네일 설정하는 태그임을 의미, content 의 "/"는 public 디렉토리 의미 */}
+                <meta property="og:title" content="한입북스"/>
+                <meta property="og:description" content="한입 북스에 등록된 도서들을 만나보세요!"/>
+                {/* 오픈그래프 타이틀과 description 설정 */}
+            </Head>
+            <div className={style.container}>
+                <section>
+                    <h3>지금 추천하는 도서</h3>
+                    {recoBooks.map((book) => <BookItem key={book.id} {...book}/>)}
+                </section>
+                <section>
+                    <h3>등록된 모든 도서</h3>
+                    {allBooks.map((book) => <BookItem key={book.id} {...book}/>)}
+                </section>
+            </div>
+        </>
     );
 
 

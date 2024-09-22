@@ -5,6 +5,7 @@ import {
 } from "next";
 import fetchOneBook from "@/lib/fetch-one-book";
 import {useRouter} from "next/router";
+import Head from "next/head";
 
 
 /*export const getServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -69,23 +70,44 @@ export const getStaticProps = async (context: GetStaticPropsContext) => {
 
 export default function Page({book}: InferGetStaticPropsType<typeof getStaticProps>) {
     const router = useRouter();
-    if (router.isFallback) return "로딩중입니다.";
+    // 페이지가 fallback 상태일 때에도 기본적인 메타태그들은 설정해 주는 것이 좋다.
+    if (router.isFallback) {
+        return <>
+            <Head>
+                <Head>
+                    <title>한입북스</title>
+                    <meta property="og:image" content="/thumbnail.png"/>
+                    <meta property="og:title" content="한입북스"/>
+                    <meta property="og:description" content="한입 북스에 등록된 도서들을 만나보세요!"/>
+                </Head>
+            </Head>
+            <div>로딩중입니다</div>
+        </>
+    }
     // 현재 페이지가 fallback 상태일 때 페이지를 설정해 주려면 router.isFallback 함수 사용
     if (!book) return "문제가 발생했습니다 다시 시도하세요";
 
     const {id, title, subTitle, description, author, publisher, coverImgUrl} = book;
 
-    return <div className={style.container}>
-        <div className={style.cover_img_container} style={{backgroundImage: `url('${coverImgUrl}')`}}>
-            <img src={coverImgUrl}/>
+    return <>
+        <Head>
+            <title>{title}</title>
+            <meta property="og:image" content={coverImgUrl}/>
+            <meta property="og:title" content={title}/>
+            <meta property="og:description" content={description}/>
+        </Head>
+        <div className={style.container}>
+            <div className={style.cover_img_container} style={{backgroundImage: `url('${coverImgUrl}')`}}>
+                <img src={coverImgUrl}/>
+            </div>
+            <div className={style.title}>{title}</div>
+            <div className={style.subtitle}>{subTitle}</div>
+            <div className={style.author}>
+                {author}| {publisher}
+            </div>
+            <div className={style.description}>{description}</div>
         </div>
-        <div className={style.title}>{title}</div>
-        <div className={style.subtitle}>{subTitle}</div>
-        <div className={style.author}>
-            {author}| {publisher}
-        </div>
-        <div className={style.description}>{description}</div>
-    </div>;
+    </>
 
     // [id]: URL 파라미터를 갖는 동적 경로 페이지 생성 가능
     // [...id]: 캐치 올 세그먼트 // 슬래시로 구분되는 경로상의 모든 아이디에 대응한다.
