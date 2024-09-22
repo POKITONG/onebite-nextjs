@@ -1,5 +1,7 @@
 import styles from "./page.module.css";
 import {useEffect} from "react";
+import ClientComponent from "@/app/(with-searchbar)/client-component";
+import ServerComponent from "@/app/(with-searchbar)/server-component";
 
 export default function Home() {
 
@@ -21,6 +23,12 @@ export default function Home() {
   return (
     <div className={styles.page}>
       인덱스 페이지
+        <ClientComponent>
+            <ServerComponent/>
+        </ClientComponent>
     </div>
   );
 }
+
+// 서버 컴포넌트를 직접 임포트하지 않고 children 프롭스로 받게 되면, 해당 컴포넌트의 결과만 props 로 받기 때문에
+// 넥스트에서는 서버 컴포넌트를 클라이언트 컴포넌트로 변경하지 않는다.
