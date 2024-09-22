@@ -1,9 +1,10 @@
 'use client';
 
 import {ChangeEvent, useState} from "react";
+import {useRouter} from "next/navigation";
 
 export default function Searchbar() {
-    const [search, setSearch] = useState();
+    const [search, setSearch] = useState("");
 
     const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -21,11 +22,16 @@ export default function Searchbar() {
          *    -> 자바스크립트의 함수는 직렬화 불가능
          *    -> 그래서 함수들은 서버 컴포넌트에서 클라이언트 컴포넌트로 Props 로 전달 불가
          */
+    };
 
+    const router = useRouter();
+
+    const onSubmit = () => {
+        router.push(`/search?q=${search}`);
     };
 
     return <div>
         <input value={search} onChange={onChangeSearch}/>
-        <button>검색</button>
+        <button onClick={onSubmit}>검색</button>
     </div>;
 };
