@@ -29,6 +29,12 @@ export const getStaticProps = async () => {
         props: {
             allBooks, recoBooks,
         },
+        revalidate: 3,
+        // ISR : SSG 를 설정한 시간마다 반복하는 사전렌더링 방식.
+        // getStaticProps 에서 props 객체 뒤에 revalidate 를 추가해서 반환해주면 된다. (초단위 사용)
+        // revalidate : 재검증하다
+        // 페이지를 기본적으로 정적으로 브라우저에게 제공함으로써 굉장히 빠른 속도로 페이지를 화면에 렌더링 할 수 있다는 장점과 더불어
+        // 일정시을 주기로 최신 데이터를 갱신할 수 있다는 장점까지 한 번에 가지고 있기 때문에 사용 추천
     };
 
     // ServerSideProps 의 return 값은 반드시 props 라는 객체 프로퍼티를 포함하는 단 하나의 객체여야만 한다.
