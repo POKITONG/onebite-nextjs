@@ -4,6 +4,7 @@ import {
     InferGetStaticPropsType
 } from "next";
 import fetchOneBook from "@/lib/fetch-one-book";
+import {useRouter} from "next/router";
 
 
 /*export const getServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -28,10 +29,22 @@ export const getStaticPaths = () => {
             {params: {id: "2"}},
             {params: {id: "3"}},
         ],
-        fallback: false,
+        fallback: true,
+
         // fallback : 대체, 대비책, 보험
+        // fallback 상태 : 페이지 컴포넌트가 아직 서버로부터 데이터를 전달받지 못 한 상태
+
         // path 값에 설정하지 않은 url 로 요청하게 되면 반환할 대비책
-        // 1. false : 없는 페이지로 취급해서 Not found 반환
+        // 1. false : paths 에 정의돼있지 않은 페이지를 요청했을 때는 Not found 반환
+
+        // 2. Blocking : SSR 방식처럼 요청받은 페이지를 사전 렌더링해서 브라우저에게 반환
+        // -> 빌드 타임에 사전에 생성하지 않았던 페이지까지 반환 가능
+        // -> 맨 처음 렌더링 할 때는 오래 걸리지만, 그 이후 요청에는 서버에 저장되기 때문에 SSG 처럼 빠르게 처리가 가능하다.
+        // !!! 주의 !!! 존재하지 않았던 페이지를 SSR 방식으로 새롭게 생성할 때 백엔드 서버에게 추가적인 데이터를 요청해야 하거나 해서
+        // 페이지의 사전 렌더링 시간이 길어지게 될 경우에는 브라우저에게 넥스트 서버가 아무것도 응답하지 않기 때문에 로딩 발생
+
+        // 3. true : 사전에 생성하지 않았던 페이지를 요청 받았을 때, Props 가 없는 페이지를 먼저 반환하고 그 이후
+        // 필요한 Props 만 계산해서 다시 전달
 
     }
     // 리턴 객체 내부에 paths 라는 이름으로 가능한 params 의 배열을 반환해주어야 한다.
@@ -43,12 +56,21 @@ export const getStaticProps = async (context: GetStaticPropsContext) => {
     const id = context.params!.id;
     const book = await fetchOneBook(Number(id));
 
+    if (!book) {
+        return {
+            notFound: true,
+        }
+    }
+
     return {
         props: {book}
-    }
+    };
 };
 
 export default function Page({book}: InferGetStaticPropsType<typeof getStaticProps>) {
+    const router = useRouter();
+    if (router.isFallback) return "로딩중입니다.";
+    // 현재 페이지가 fallback 상태일 때 페이지를 설정해 주려면 router.isFallback 함수 사용
     if (!book) return "문제가 발생했습니다 다시 시도하세요";
 
     const {id, title, subTitle, description, author, publisher, coverImgUrl} = book;

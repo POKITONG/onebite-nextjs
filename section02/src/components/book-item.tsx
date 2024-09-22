@@ -5,7 +5,7 @@ import style from "./book-item.module.css";
 export default function BookItem({
                                      id,
                                      title,
-                                     subtitle,
+                                     subTitle,
                                      description,
                                      author,
                                      publisher,
@@ -15,7 +15,7 @@ export default function BookItem({
         <img src={coverImgUrl}/>
         <div>
             <div className={style.title}>{title}</div>
-            <div className={style.subTitle}>{subtitle}</div>
+            <div className={style.subTitle}>{subTitle}</div>
             <br/>
             <div className={style.author}>
                 {author} | {publisher}
